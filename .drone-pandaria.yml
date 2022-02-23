@@ -1,0 +1,150 @@
+kind: pipeline
+name: linux-amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: build
+    image: rancher/dapper:v0.5.7
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
+    commands:
+      - dapper ci
+    when:
+      refs:
+      - refs/head/release*
+      - refs/tags/*
+      event:
+      - push
+      - pull_request
+      - tag
+  - name: stage-binaries
+    image: rancher/dapper:v0.5.7
+    commands:
+      - cp -r ./bin/* ./
+    when:
+      refs:
+      - refs/head/release*
+      - refs/tags/*
+      event:
+      - tag
+  - name: publish-rke-tools-amd64
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      dockerfile: package/Dockerfile
+      build_args:
+        - ARCH=amd64
+      repo: cnrancher/rke-tools
+      tag: "${DRONE_TAG}-linux-amd64"
+      no_cache: true
+    when:
+      refs:
+      - refs/head/release*
+      - refs/tags/*
+      event:
+      - tag
+
+node:
+  instance: agent-amd64
+
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
+---
+kind: pipeline
+name: linux-arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+  - name: build
+    image: rancher/dapper:v0.5.7
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
+    commands:
+      - dapper ci
+    when:
+      refs:
+      - refs/head/release*
+      - refs/tags/*
+      event:
+      - push
+      - pull_request
+      - tag
+  - name: stage-binaries
+    image: rancher/dapper:v0.5.7
+    commands:
+      - cp -r ./bin/* ./
+    when:
+      refs:
+      - refs/head/release*
+      - refs/tags/*
+      event:
+      - tag
+  - name: publish-rke-tools-arm64
+    image: plugins/docker:linux-arm64
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      dockerfile: package/Dockerfile
+      build_args:
+        - ARCH=arm64
+      repo: cnrancher/rke-tools
+      tag: "${DRONE_TAG}-linux-arm64"
+      no_cache: true
+    when:
+      refs:
+      - refs/head/release*
+      - refs/tags/*
+      event:
+      - tag
+
+node:
+  instance: agent-arm64
+
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
+---
+kind: pipeline
+name: manifest
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: push-manifest
+    image: plugins/manifest
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      spec: manifest-pandaria.tmpl
+    when:
+      refs:
+      - refs/head/release*
+      - refs/tags/*
+      event:
+      - tag
+node:
+  instance: agent-amd64
+
+depends_on:
+- linux-amd64
+- linux-arm64
