@@ -10,10 +10,10 @@ RUN apk -U upgrade \
     && apk -U --no-cache add bash \
     && rm -f /bin/sh \
     && ln -s /bin/bash /bin/sh
-ENV RANCHER_CONFD_VERSION=v0.16.4
+ENV RANCHER_CONFD_VERSION=v0.16.4-ent2
 RUN apk -U --no-cache add curl wget ca-certificates tar sysstat acl\
     && mkdir -p /opt/rke-tools/bin /etc/confd \
-    && curl -sLf https://github.com/rancher/confd/releases/download/${RANCHER_CONFD_VERSION}/confd-${RANCHER_CONFD_VERSION}-linux-${ARCH} > /usr/bin/confd \
+    && curl -sLf https://github.com/cnrancher/confd/releases/download/${RANCHER_CONFD_VERSION}/confd-${RANCHER_CONFD_VERSION}-linux-${ARCH} > /usr/bin/confd \
     && chmod +x /usr/bin/confd \
     && curl -sLf ${!DOCKER_URL} | tar xvzf - -C /opt/rke-tools/bin --strip-components=1 docker/docker \
     && curl -sLf ${CRIDOCKERD_URL} | tar xvzf - -C /opt/rke-tools/bin --strip-components=1 cri-dockerd/cri-dockerd \
