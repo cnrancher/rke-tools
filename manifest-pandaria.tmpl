@@ -1,12 +1,12 @@
-image: cnrancher/rke-tools:{{build.tag}}
+image: cnrancher/cn-rke-tools:{{build.tag}}
 manifests:
   -
-    image: cnrancher/rke-tools:{{build.tag}}-linux-amd64
+    image: cnrancher/cn-rke-tools:{{build.tag}}-linux-amd64
     platform:
       architecture: amd64
       os: linux
   -
-    image: cnrancher/rke-tools:{{build.tag}}-linux-arm64
+    image: cnrancher/cn-rke-tools:{{build.tag}}-linux-arm64
     platform:
       architecture: arm64
       os: linux

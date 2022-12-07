@@ -10,7 +10,7 @@ SUFFIX=""
 cd $(dirname $0)/../package
 
 TAG=${TAG:-${VERSION}${SUFFIX}}
-REPO=${REPO:-rancher}
+REPO=${REPO:-cnrancher}
 
 if echo $TAG | grep -q dirty; then
     TAG=dev
@@ -19,7 +19,7 @@ fi
 cp ../bin/rke-etcd-backup .
 cp -r ../{conf.d,cert-deployer,templates,nginx-proxy,*.sh} .
 
-IMAGE=${REPO}/rke-tools:${TAG}
+IMAGE=${REPO}/cn-rke-tools:${TAG}
 docker build --build-arg ARCH=${ARCH} -t ${IMAGE} .
 echo ${IMAGE} > ../dist/images
 echo Built ${IMAGE}
